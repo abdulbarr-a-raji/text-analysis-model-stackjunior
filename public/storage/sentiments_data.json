@@ -1,0 +1,28 @@
+{
+  "training": [
+    {"text": "I had an amazing time with my friends at the park today.","label": "positive"},
+    {"text": "This coffee tastes incredible and really brightened my morning.","label": "positive"},
+    {"text": "The new software update makes my laptop run so smoothly.","label": "positive"},
+    {"text": "I feel so grateful for the support of my family.","label": "positive"},
+    {"text": "The movie last night was absolutely fantastic and uplifting.","label": "positive"},
+    {"text": "Our team worked really well together and achieved great results.","label": "positive"},
+    {"text": "I love how peaceful and relaxing the weather is today.","label": "positive"},
+    {"text": "The book I’m reading is inspiring and full of hope.","label": "positive"},
+    {"text": "My workout session left me energized and happy.","label": "positive"},
+    {"text": "That concert was one of the best experiences of my life.","label": "positive"},
+    {"text": "The food at that restaurant was delicious and satisfying.","label": "positive"},
+    {"text": "I feel confident and ready to take on new challenges.","label": "positive"},
+    {"text": "My pet always makes me smile with its playful nature.","label": "positive"},
+    {"text": "Traveling to new places gives me so much joy and excitement.","label": "positive"},
+    {"text": "Learning something new today made me feel accomplished.","label": "positive"},
+    {"text": "The flowers in the garden are blooming beautifully.","label": "positive"},
+    {"text": "I’m so proud of the progress I’ve made this week.","label": "positive"},
+    {"text": "Helping others always brings me a sense of fulfillment.","label": "positive"},
+    {"text": "The project presentation went really well and was appreciated.","label": "positive"},
+    {"text": "Waking up early gave me such a productive and positive day.","label": "positive"}
+  ],
+  "testing": [
+    {"text": "Music always lifts my spirits and keeps me motivated.","label": "positive"},
+    {"text": "I’m looking forward to tomorrow with excitement and optimism.","label": "positive"}
+  ]
+}

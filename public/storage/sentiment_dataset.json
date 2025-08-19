@@ -1,0 +1,30 @@
+{
+  "training": [
+    {
+      "text": "yes",
+      "label": "positive"
+    },
+    {
+      "text": "yay",
+      "label": "neutral"
+    },
+    {
+      "text": "hooray",
+      "label": "negative"
+    }
+  ],
+  "testing": [
+    {
+      "text": "",
+      "label": "positive"
+    },
+    {
+      "text": "",
+      "label": "neutral"
+    },
+    {
+      "text": "",
+      "label": "negative"
+    }
+  ]
+}

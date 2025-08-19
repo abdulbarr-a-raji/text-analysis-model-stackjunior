@@ -1,0 +1,8 @@
+{
+    "include": [
+        "./src/**/*"
+    ],
+    "compilerOptions": {
+        "types": [] // to prevent a "Cannot find type definition file for 'minimatch'"
+    }
+}
