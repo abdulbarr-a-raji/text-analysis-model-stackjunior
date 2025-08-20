@@ -1,11 +1,25 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <p>
-      Placeholder
+    <p v-if="loadingEncoder" class="txt-small">
+      <strong>Loading Universal Sentence Encoder...</strong>
     </p>
-    <button id="dev-button" v-on:click="this.run">Run in console</button>
-    <pre>{{ EMBEDDINGS_SIZE }}</pre>
+
+    <div v-else>
+      <button id="train-button" v-on:click="this.run">Train model</button>
+      <br>
+      <button id="predict-button" v-on:click="this.getPrediction">Predict with model</button>
+    </div>
+    
+    <p v-if="trainingComplete">
+      Accuracy = {{ finalAcc }}%
+    </p>
+    <p v-if="startedPrediction" class="txt-small">
+      <strong>Current test data: </strong>
+      <pre>{{ chosenTestQuestion }}</pre>
+      <br>
+      Model predicts... {{ modelPrediction }}
+    </p>
   </div>
 </template>
 
@@ -19,7 +33,6 @@ train model
 don't forget disposals
 allow for predictions
 */
-// import getEmbedder from '/public/loadEmbedder.js'
 
 export default {
   name: 'SentimentModel',
@@ -34,53 +47,34 @@ export default {
   },
   data() {
     return {
-      embedder: null,
       EMBEDDINGS_SIZE: undefined,
+      embedder: null,
       model: null,
-      tempSentimentDataset: {
-        "training": [
-          {"text": "I had an amazing time with my friends at the park today.","label": "positive"},
-          {"text": "This coffee tastes incredible and really brightened my morning.","label": "positive"},
-          {"text": "The new software update makes my laptop run so smoothly.","label": "positive"},
-          {"text": "I feel so grateful for the support of my family.","label": "positive"},
-          {"text": "The movie last night was absolutely fantastic and uplifting.","label": "positive"},
-          {"text": "Our team worked really well together and achieved great results.","label": "positive"},
-          {"text": "I love how peaceful and relaxing the weather is today.","label": "positive"},
-          {"text": "The book I’m reading is inspiring and full of hope.","label": "positive"},
-          {"text": "My workout session left me energized and happy.","label": "positive"},
-          {"text": "That concert was one of the best experiences of my life.","label": "positive"},
-          {"text": "The food at that restaurant was delicious and satisfying.","label": "positive"},
-          {"text": "I feel confident and ready to take on new challenges.","label": "positive"},
-          {"text": "My pet always makes me smile with its playful nature.","label": "positive"},
-          {"text": "Traveling to new places gives me so much joy and excitement.","label": "positive"},
-          {"text": "Learning something new today made me feel accomplished.","label": "positive"},
-          {"text": "The flowers in the garden are blooming beautifully.","label": "positive"},
-          {"text": "I’m so proud of the progress I’ve made this week.","label": "positive"},
-          {"text": "Helping others always brings me a sense of fulfillment.","label": "positive"},
-          {"text": "The project presentation went really well and was appreciated.","label": "positive"},
-          {"text": "Waking up early gave me such a productive and positive day.","label": "positive"}
-        ],
-        "testing": [
-          {"text": "Music always lifts my spirits and keeps me motivated.","label": "positive"},
-          {"text": "I’m looking forward to tomorrow with excitement and optimism.","label": "positive"}
-        ]
-      },
-      tempSubjectDataset: undefined
+      dataset: {},
+      chosenTestQuestion: "",
+      modelPrediction: "N/A",
+      finalAcc: undefined,
+
+      //flags
+      loadingEncoder: false,
+      startedPrediction: false,
+      trainingComplete: false
     }
   },
   methods: {
     async loadEmbedder() {
       try {
         if(this.embedder) {
-          console.log('USE model already loaded:\n', this.embedder);
+          console.log('USE model already loaded...');
         } else {
+          this.loadingEncoder = true;
           let start = performance.now();
           this.embedder = await window.use.load();
           let end = performance.now();
-          this.logTimeTaken(start, end); // mean value is ~2.2 seconds
+          this.logTimeTaken(start, end, "Loading Tensorflow USE..."); // mean value is ~2.2 seconds
           this.memoryMeter();
-          console.log("Universal Sentence Embedder?", this.embedder ? "yes" : "no");
-          console.log('USE model loaded', this.embedder);
+          console.log("Universal Sentence Encoder loaded?", this.embedder ? "yes" : "no");
+          this.loadingEncoder = false;
         } // this if statement is not mitigating increase in number of tensors for each mount, must find solution using dispose()
       } catch (err) {
         console.error('Failed to load USE model:', err);
@@ -88,44 +82,56 @@ export default {
     },
     async getEmbeddingsAndLabels(json_rel_file_path) {
       //load json file, not loading leading '{' char, leave for now
-      let jsonDataset = {};
       console.log("json file at:", json_rel_file_path);
       try {
         const response = await fetch(json_rel_file_path);
         const fetch_contents = await response.text();
-        console.log(fetch_contents.slice(1, 50));
-        jsonDataset = await response.json().catch(() => {
-          console.log("file found: ", response.status, response.ok);
-          console.log(`Failed to load a supposed '${json_rel_file_path}' file`);
-        });
+        console.log(fetch_contents.slice(1, 20));
+
+        // jsonDataset = await response.json().catch(() => {});
+        // because response.json() omits the leading '{' for some reason, the above
+        // line of code doesn't work
+        this.dataset = JSON.parse(fetch_contents)
+        console.log("file found: ", response.status, response.ok);
+        console.log(`Loaded '${json_rel_file_path}' file`);
       } catch (e) {
-        console.error(e);
+        console.error(`Failed to load a supposed '${json_rel_file_path}' file`, e);
       }
+      console.log("data?", this.dataset);
       
       const text_inputs = [], labels = [];
-      console.log("data?", jsonDataset);
-      console.log("data?", this.tempSentimentDataset);
-      this.tempSentimentDataset.training.forEach((item) => {
+      this.dataset.training.forEach((item) => {
         text_inputs.push(item.text.trim().toLowerCase());
         labels.push(this.classes[item.label]);
       });
-      console.log("text data?", text_inputs);
-      console.log("labels?", labels);
 
       this.tf.util.shuffleCombo(
         text_inputs,
         labels
       );
 
-      // const embeddings = ;
+      //preparing validation data
+      const val_text = [], val_labels = [];
+      this.dataset.validation.forEach((item) => {
+        val_text.push(item.text.trim().toLowerCase());
+        val_labels.push(this.classes[item.label]);
+      });
 
-      return [
+      return {
+        train: [
         await this.embedder.embed(text_inputs), 
         this.tf.tidy(() => {
           return this.tf.oneHot(this.tf.tensor1d(labels, "int32"), 
           Object.values(this.classes).length)
         })
-      ];
+      ],
+      val: [
+        await this.embedder.embed(val_text), 
+        this.tf.tidy(() => {
+          return this.tf.oneHot(this.tf.tensor1d(val_labels, "int32"), 
+          Object.values(this.classes).length)
+        })
+      ]};
     },
     async initialiseModel() {
       this.model = this.tf.sequential();
@@ -134,7 +140,7 @@ export default {
       this.model.add(
         this.tf.layers.dense({
           inputShape: [this.EMBEDDINGS_SIZE],
-          units: 64,
+          units: 128,
           activation: "relu"
         })
       );
@@ -168,25 +174,31 @@ export default {
     },
     async trainClassificationModel() {
       let start = performance.now();
-      const [Xtrain, Ytrain] = await this.getEmbeddingsAndLabels(this.datasetFile);
+      const datastructure = await this.getEmbeddingsAndLabels(this.datasetFile);
+      const [Xtrain, Ytrain] = datastructure.train;
       let end = performance.now();
-      this.logTimeTaken(start, end);
+      this.logTimeTaken(start, end, "Fetching dataset as tensors...");
       this.memoryMeter();
       console.log("x size:", Xtrain.shape);
       Xtrain.print();
 
       this.EMBEDDINGS_SIZE = Xtrain.shape[1];
-      console.log("embedding size:", this.EMBEDDINGS_SIZE);
+      const NUM_EPOCHS = 10;
       await this.initialiseModel();
-      console.log("input shape:", this.model.inputShape);
 
-      let trainingResults = await this.model.fit(Xtrain, Ytrain, {
+      start = performance.now();
+      const trainingResults = await this.model.fit(Xtrain, Ytrain, {
         shuffle: true,
-        // batchSize: 16,
-        epochs: 10
+        validationData: datastructure.val,
+        batchSize: 16,
+        epochs: NUM_EPOCHS
       });
+      end = performance.now();
+      this.logTimeTaken(start, end, "Training Classification model...");
 
       console.log("Training results:", trainingResults.history);
+      this.trainingComplete = true;
+      this.finalAcc = (trainingResults.history.acc[NUM_EPOCHS-1]*100).toFixed(2);
       this.memoryMeter();
       // Xtrain.dispose();
       // Ytrain.dispose();
@@ -194,11 +206,32 @@ export default {
     memoryMeter() {
       console.log("memory meter (# of tensors):", this.tf.memory().numTensors);
     },
-    logTimeTaken(start, end) {
+    logTimeTaken(start, end, title="") {
       const timeTakenInSeconds = ((end - start) / 1000).toFixed(2);
-      console.log("Time taken(s) = "+timeTakenInSeconds, "seconds");
+      console.log(
+        `
+        ${title}
+        Time taken(s) = ${timeTakenInSeconds} seconds
+        `
+      );
     },
-    async run() {
+    getPrediction() {
+      this.getRandomTestData();
+      this.embedder.embed([this.chosenTestQuestion]).then((input_tns) => {
+        const rawPrediction = this.model.predict(input_tns);
+        rawPrediction.print();
+        const predictionValue = rawPrediction.argMax(-1).dataSync()[0];
+
+        this.startedPrediction = true;
+        this.modelPrediction = Object.keys(this.classes)
+                              .find(key => this.classes[key] === predictionValue);
+      });
+    },
+    getRandomTestData() {
+      const selected = Math.floor(Math.random() * this.dataset.testing.length);
+      this.chosenTestQuestion = this.dataset.testing[selected].text.trim().toLowerCase();
+    },
+    async run() { // redundant?
       await this.trainClassificationModel();
     }
   }
@@ -220,5 +253,8 @@ li {
 }
 a {
   color: #42b983;
+}
+.txt-small {
+  font-size: smaller;
 }
 </style>
