@@ -1,7 +1,9 @@
 # text-analysis-model-stackjunior
-Fine-tuning 2 models for 2 text classification tasks: Sentiment analysis and Subject analysis. This task is part of my internship at Stackjunior™️.
+Fine-tuning 2 models for 2 text classification tasks: 
+1. sentiment analysis
+2. subject analysis.
 
-# text-analysis-model-stackjunior
+### This task is part of my internship at Stackjunior™.
 
 ## Project setup
 ```
