@@ -70,11 +70,14 @@
     {"text": "I keep making the same mistakes, and it's frustrating.","label": "negative"}
   ],
   "testing": [
-    {"text": "Her feedback was helpful and uplifting.","label": "positive"},
-    {"text": "I genuinely appreciate all your support.","label": "positive"},
-    {"text": "We arrived at the venue just before it opened.","label": "neutral"},
-    {"text": "They sat quietly while waiting for their turn.","label": "neutral"},
-    {"text": "His comment made everyone uncomfortable.","label": "negative"},
-    {"text": "I keep making the same mistakes, and it's frustrating.","label": "negative"}
+    {"text": "I am really proud of how much progress I've made this week","label": "positive"},
+    {"text": "Sarah did an amazing job on her project and everyone enjoyed it","label": "positive"},
+    {"text": "You are a wonderful friend who always makes people smile","label": "positive"},
+    {"text": "I have a meeting scheduled for tomorrow morning","label": "neutral"},
+    {"text": "James is reading a book in the library","label": "neutral"},
+    {"text": "The teacher gave us three homework assignments to finish this week","label": "neutral"},
+    {"text": "I lost my keys and can't find them anywhere","label": "negative"},
+    {"text": "Maria felt upset after receiving a low grade on her test","label": "negative"},
+    {"text": "The bus was late again and it made everyone frustrated","label": "negative"}
   ]
 }

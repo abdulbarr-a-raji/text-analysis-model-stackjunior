@@ -91,7 +91,7 @@ export default {
         // jsonDataset = await response.json().catch(() => {});
         // because response.json() omits the leading '{' for some reason, the above
         // line of code doesn't work
-        this.dataset = JSON.parse(fetch_contents)
+        this.dataset = JSON.parse(fetch_contents);
         console.log("file found: ", response.status, response.ok);
         console.log(`Loaded '${json_rel_file_path}' file`);
       } catch (e) {
@@ -238,7 +238,6 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h3 {
   margin: 40px 0 0;

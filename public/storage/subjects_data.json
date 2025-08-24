@@ -62,19 +62,22 @@
         {"text": "How does the water cycle move water through the environment","label": "science"}
     ],
     "validation":[
-        {"text": "Do verbs change depending on tense?","label": "english"},
-        {"text": "Can you write a paragraph that has a topic sentence","label": "english"},
+        {"text": "Why does the author use metaphors in this poem","label": "english"},
+        {"text": "What is the difference between a noun and a verb","label": "english"},
         {"text": "What are fractions used for in real life","label": "maths"},
         {"text": "Can you show me how to count to 20 using blocks","label": "maths"},
         {"text": "How do you measure the density of a liquid","label": "science"},
         {"text": "Why do stars twinkle in the night sky","label": "science"}
     ],
     "testing":[
-        {"text": "Do verbs change depending on tense?","label": "english"},
-        {"text": "Can you write a paragraph that has a topic sentence","label": "english"},
-        {"text": "What are fractions used for in real life","label": "maths"},
-        {"text": "Can you show me how to count to 20 using blocks","label": "maths"},
-        {"text": "How do you measure the density of a liquid","label": "science"},
-        {"text": "Why do stars twinkle in the night sky","label": "science"}
+        {"text": "Can you tell me what the main idea of the story is","label": "english"},
+        {"text": "Who was the first president of the United States","label": "english"},
+        {"text": "How does Shakespeare show conflict between characters in Romeo and Juliet","label": "english"},
+        {"text": "If you have 8 apples and eat 3, how many are left","label": "maths"},
+        {"text": "What is the value of x in the equation 2x + 5 = 11","label": "maths"},
+        {"text": "How many degrees are in the interior angles of a hexagon","label": "maths"},
+        {"text": "Why do plants need sunlight to grow","label": "science"},
+        {"text": "If a car travels 100 km in 2 hours what is its average speed","label": "science"},
+        {"text": "How many protons are there in a carbon atom","label": "science"}
     ]
 }
